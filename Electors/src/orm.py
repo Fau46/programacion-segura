@@ -1,9 +1,10 @@
 from enum import unique
 from flask_sqlalchemy import SQLAlchemy
+from dataclasses import dataclass
 
 db = SQLAlchemy()
 
-
+@dataclass
 class Elector(db.Model):
     __tablename__ = 'elector'
     __table_args__ = {'sqlite_autoincrement':True}
@@ -20,7 +21,7 @@ class Elector(db.Model):
                      'dateofbirth', 'dni', 'can_vote'):
             js[attr] = getattr(self, attr)
         return js
-
+@dataclass
 class User(db.Model):
     __tablename__ = 'user'
     __table_args__ = {'sqlite_autoincrement':True}

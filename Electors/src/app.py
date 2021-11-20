@@ -13,7 +13,7 @@ from orm import Elector, User, db
 from utils import *
 import errors
 import os
-
+import json
 """
 The default app configuration: 
 in case a configuration is not found or 
@@ -106,7 +106,7 @@ def new_user():
         logging.info("- Service: Elector not found")
         return errors.Error404("Elector not found").get()
 
-    elector_id = result[0][0]
+    elector_id = result[0]["elector_id"]
 
     user = add_user(user["username"], user["password"], elector_id)
     if user is None:
@@ -124,12 +124,13 @@ def get_user(dni):
     query = "SELECT user.username, user.password, elector.dni FROM elector,user WHERE elector.id = user.elector_id AND elector.dni="+str(dni)
     
     result = db.engine.execute(query)
-    result = [row for row in result]
+    result = [dict(row.items()) for row in result]
+    print(result)
 
     if len(result) == 0:
         return errors.Error404("User not Found").get()
     else:
-        return jsonify(result), 200 #may return all user if sqlinjection
+        return result, 200 #may return all user if sqlinjection
         
 
 def time():
