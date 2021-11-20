@@ -1,0 +1,58 @@
+openapi: 3.0.1
+info:
+  title: Service 
+  description: Service REST API
+  version: "0.1"
+servers:
+- url: /
+paths:
+  /time:
+    get:
+      summary: Get current time
+      operationId: app.time
+      responses:
+        200:
+          description: Get current time
+  /check_credentials:
+    get:
+      summary: Check user redentials
+      operationId: app.check_credentials
+      parameters:
+        - in: query
+          name: username
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: password
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Check OK
+        400:
+          description: Wrong credentials
+
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Error type
+          example: about:blank
+        title:
+          type: string
+          description: Error name
+          example: Bad Request
+        status:
+          type: integer
+          description: Error status code
+          example: about:blank
+        detail:
+          type: string
+          description: Error description
+          example: None is not of type 'string'
