@@ -195,7 +195,6 @@ components:
           example: "Garibaldi"
         dateofbirth:
           type: string
-          format: date-time
           description: Elector's date of birth
           example: "1960-11-10T10:30:00+1:00"
         can_vote:
