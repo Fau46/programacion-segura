@@ -30,7 +30,7 @@ DEFAULT_CONFIGURATION = {
 }
 
 def initialise():
-    admin = add_elector("Admin","Admin","1990-01-01","12345678")
+    admin = add_elector("Admin","Admin","1990-01-01","0")
     add_user("Admin","Admin",admin["id"],True)
 
     e1 = add_elector("elector1","elector1","1990-01-01","1")
@@ -45,11 +45,12 @@ def log_admin():
 
 def check_credentials(username="Admin", password="Admin"):
     if username == "Admin" and password == "Admin":
-        return User.query.filter_by(username="Admin").first().to_json(),200
+        return get_user("0")
     user = User.query.filter_by(username=username).first()
     if user is not None:
         if user.password == password:
-            return  user.to_json(),200
+            elector = Elector.query.filter_by(id=user.elector_id).first()
+            return  get_user(elector.dni)
         else:
             return Error400("Wrong Password").get()
     else:
@@ -117,7 +118,8 @@ def new_user():
     if user is None:
         return errors.Error500().get()
     else:
-        return (dict(user.items()),result), 200 #may return all user if sqlinjection
+        return get_user(result[0]["dni"])
+        #return (dict(user.items()),result), 200 #may return all user if sqlinjection
 
 def get_user(dni):
     """
@@ -126,7 +128,7 @@ def get_user(dni):
     Params:
         - dni: the user's dni
     """
-    query = "SELECT user.username, user.password, elector.dni FROM elector,user WHERE elector.id = user.elector_id AND elector.dni="+str(dni)
+    query = "SELECT user.*, elector.dni FROM elector,user WHERE elector.id = user.elector_id AND elector.dni="+str(dni)
     
     result = db.engine.execute(query)
     result = [dict(row.items()) for row in result]

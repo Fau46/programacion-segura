@@ -27,7 +27,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/ReadUser'
         400:
           description: Wrong credentials
           content:
@@ -43,14 +43,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Elector'
+              $ref: '#/components/schemas/WriteElector'
       responses:
         201:
           description: Elector added
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Elector'
+                $ref: '#/components/schemas/ReadElector'
         500:
           description: An error occured
           content:
@@ -74,7 +74,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Elector'
+                $ref: '#/components/schemas/ReadElector'
         404:
           description: An error occured
           content:
@@ -90,14 +90,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/WriteUser'
       responses:
         201:
           description: User added
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/ReadUser'
         500:
           description: An error occured
           content:
@@ -121,7 +121,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/ReadUser'
         404:
           description: An error occured
           content:
@@ -175,7 +175,38 @@ components:
           type: string
           description: Error description
           example: None is not of type 'string'
-    Elector:
+    ReadElector:
+      type: object
+      properties:
+        dni:
+          minLength: 1
+          type: string
+          description: Elector's DNI
+          example: "1234567890"
+        firstname:
+          minLength: 1
+          type: string
+          description: Elector's firstname
+          example: "Giuseppe"
+        lastname:
+          minLength: 1
+          type: string
+          description: Elector's lastname
+          example: "Garibaldi"
+        dateofbirth:
+          type: string
+          format: date-time
+          description: Elector's date of birth
+          example: "1960-11-10T10:30:00+1:00"
+        can_vote:
+          example: true
+          type: boolean
+        id:
+          minLength: 1
+          type: string
+          description: Elector ID
+          example: "1234567890"
+    WriteElector:
       type: object
       required:
         - dni
@@ -203,10 +234,7 @@ components:
           format: date-time
           description: Elector's date of birth
           example: "1960-11-10T10:30:00+1:00"
-        can_vote:
-          example: true
-          type: boolean
-    User:
+    WriteUser:
       type: object
       required:
         - username
@@ -228,4 +256,36 @@ components:
           type: string
           description: Elector's DNI
           example: "1234567890"
+    ReadUser:
+      type: object
+      properties:
+        username:
+          minLength: 1
+          type: string
+          description: User's firstname
+          example: "Giuseppe"
+        password:
+          minLength: 1
+          type: string
+          description: User's password
+          example: "Garibaldi"
+        dni:
+          minLength: 1
+          type: string
+          description: Elector's DNI
+          example: "1234567890"
+        id:
+          minLength: 1
+          type: string
+          description: User ID
+          example: "1234567890"
+        elector_id:
+          minLength: 1
+          type: string
+          description: Elector's ID
+          example: "1234567890"
+        is_admin:
+          type: boolean
+          description: User is an Admin
+          example: false
         
