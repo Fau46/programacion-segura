@@ -30,7 +30,7 @@ DEFAULT_CONFIGURATION = {
 }
 
 def initialise():
-    admin = add_elector("Admin","Admin","1990-01-01","0")
+    admin = add_elector("Admin","Admin","1990-01-01","1abc")
     add_user("Admin","Admin",admin["id"],True)
 
     e1 = add_elector("elector1","elector1","1990-01-01","1")
@@ -50,14 +50,14 @@ def check_credentials(username="Admin", password="Admin"):
     if user is not None:
         if user.password == password:
             elector = Elector.query.filter_by(id=user.elector_id).first()
-            return  get_user(elector.dni)
+            return  get_user(elector.dni)[0]
         else:
             return Error400("Wrong Password").get()
     else:
         return Error400("User Not Found").get()
 
 def can_vote(dni, allowed):
-    query = "UPDATE elector SET can_vote ="+str(allowed)+" WHERE dni="+str(dni)
+    query = "UPDATE elector SET can_vote ="+str(eval(str(allowed)))+" WHERE dni=\""+str(dni)+"\""
     
     try:
         db.engine.execute(query)
@@ -72,15 +72,23 @@ def get_elector(dni):
     Params:
         - dni: the user's dni
     """
-    query = "SELECT * FROM elector WHERE dni="+str(dni)
+    query = "SELECT * FROM elector WHERE dni=\""+str(dni)+"\""
     
     result = db.engine.execute(query)
     result = [dict(row.items()) for row in result]
 
+    try:
+        assert(len(result) != 0)
+        return result, 200 #may return all user if sqlinjection
+    except:
+        return errors.Error404("Elector not Found").get()
+
+    """
     if len(result) == 0:
         return errors.Error404("Elector not Found").get()
     else:
         return result, 200 #may return all user if sqlinjection
+    """
 
 def new_elector():
     """
@@ -101,7 +109,7 @@ def new_elector():
 
 def new_user():
     user = request.json
-    query = "SELECT * FROM elector WHERE dni="+str(user["dni"])
+    query = "SELECT * FROM elector WHERE dni=\""+str(user["dni"])+"\""
     
     result = db.engine.execute(query)
     result = [dict(row.items()) for row in result]
@@ -128,7 +136,7 @@ def get_user(dni):
     Params:
         - dni: the user's dni
     """
-    query = "SELECT user.*, elector.dni FROM elector,user WHERE elector.id = user.elector_id AND elector.dni="+str(dni)
+    query = "SELECT user.*, elector.dni FROM elector,user WHERE elector.id = user.elector_id AND elector.dni=\""+str(dni)+"\""
     
     result = db.engine.execute(query)
     result = [dict(row.items()) for row in result]
@@ -250,6 +258,7 @@ if __name__ == '__main__':
             )
 
 """
+B101    assert_used
 B104    hardcoded_bind_all_interfaces
 B105    hardcoded_password_string
 B106    hardcoded_password_funcarg
@@ -259,7 +268,6 @@ B201    flask_debug_true
 
 PASSWORD IN CHIARO NOT DETECTED
 
-B101    assert_used
 B102    exec_used
 B103    set_bad_file_permissions
 B108    hardcoded_tmp_directory
