@@ -6,7 +6,7 @@ from datetime import datetime
 import hashlib
 from flask_cors import CORS
 
-from flask import current_app, request
+from flask import current_app, request, jsonify
 from src.errors import Error500
 
 from orm import Elector, User, db
@@ -45,12 +45,12 @@ def log_admin():
 
 def check_credentials(username="Admin", password="Admin"):
     if username == "Admin" and password == "Admin":
-        return {"status":True},200
+        return jsonify({"status":True}),200
     user = User.query.filter_by(username=username).first()
     if user is not None:
         if user.password == password:
-            return {"status":True},200
-    return {"status":False},400
+            return jsonify({"status":True}),200
+    return jsonify({"status":False}),400
 
 def can_vote(dni, allowed):
     query = "UPDATE elector SET can_vote ="+str(allowed)+" WHERE dni="+str(dni)
@@ -76,7 +76,7 @@ def get_elector(dni):
     if len(result) == 0:
         return errors.Error404("Elector not Found").get()
     else:
-        return result, 200 #may return all user if sqlinjection
+        return jsonify(result), 200 #may return all user if sqlinjection
 
 def new_elector():
     """
@@ -93,7 +93,7 @@ def new_elector():
     if elector is None:
         return errors.Error500().get()
     else:
-        return elector, 201
+        return jsonify(elector), 201
 
 def new_user():
     user = request.json
@@ -112,7 +112,7 @@ def new_user():
     if user is None:
         return errors.Error500().get()
     else:
-        return (user,result), 200 #may return all user if sqlinjection
+        return jsonify((user,result)), 200 #may return all user if sqlinjection
 
 def get_user(dni):
     """
@@ -129,7 +129,7 @@ def get_user(dni):
     if len(result) == 0:
         return errors.Error404("User not Found").get()
     else:
-        return result, 200 #may return all user if sqlinjection
+        return jsonify(result), 200 #may return all user if sqlinjection
         
 
 def time():
