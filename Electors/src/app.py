@@ -78,23 +78,26 @@ def get_elector(dni):
     else:
         return result, 200 #may return all user if sqlinjection
 
-def new_elector(dni, name, birthdate, password):
+def new_elector():
     """
     Creates a new elector in the database
 
     Params:
         - dni: the elector's dni
-        - name: the elector's name
-        - birthdate: the elector's birthdate
+        - firstname: the elector's firstname
+        - lastname: the elector's lastname
+        - dateofbirth: the elector's birthdate
     """
-    elector = add_elector(dni, name, birthdate, password)
+    elector = request.json
+    elector = add_elector(elector["firstname"], elector["lastname"], elector["dateofbirth"], elector["dni"])
     if elector is None:
-        return errors.Error500("Error creating elector").get()
+        return errors.Error500().get()
     else:
-        return elector, 200
+        return elector, 201
 
-def new_user(dni, username, password):
-    query = "SELECT * FROM elector WHERE dni="+str(dni)
+def new_user():
+    user = request.json
+    query = "SELECT * FROM elector WHERE dni="+str(user["dni"])
     
     result = db.engine.execute(query)
     result = [row for row in result]
@@ -105,9 +108,9 @@ def new_user(dni, username, password):
 
     elector_id = result[0][0]
 
-    user = add_user(username, password, elector_id)
+    user = add_user(user["username"], user["password"], elector_id)
     if user is None:
-        return errors.Error500("Error creating user").get()
+        return errors.Error500().get()
     else:
         return (user,result), 200 #may return all user if sqlinjection
 
@@ -118,7 +121,7 @@ def get_user(dni):
     Params:
         - dni: the user's dni
     """
-    query = "SELECT * FROM elector,user WHERE elector.id = user.elector_id AND elector.dni="+str(dni)
+    query = "SELECT user.username, user.password, elector.dni FROM elector,user WHERE elector.id = user.elector_id AND elector.dni="+str(dni)
     
     result = db.engine.execute(query)
     result = [row for row in result]

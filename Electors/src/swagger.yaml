@@ -6,13 +6,6 @@ info:
 servers:
 - url: /
 paths:
-  /time:
-    get:
-      summary: Get current time
-      operationId: app.time
-      responses:
-        200:
-          description: Get current time
   /check_credentials:
     get:
       summary: Check user redentials
@@ -54,8 +47,16 @@ paths:
       responses:
         201:
           description: Elector added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Elector'
         500:
           description: An error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /electors/{dni}:
     get:
@@ -70,8 +71,16 @@ paths:
       responses:
         200:
           description: Elector's Info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Elector'
         404:
           description: An error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users:
     post:
@@ -85,8 +94,16 @@ paths:
       responses:
         201:
           description: User added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         500:
           description: An error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/{dni}:
     get:
@@ -100,9 +117,17 @@ paths:
             type: string
       responses:
         200:
-          description: User added
+          description: Users' Info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         404:
           description: An error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
