@@ -86,7 +86,6 @@ def new_elector(dni, name, birthdate, password):
         - dni: the elector's dni
         - name: the elector's name
         - birthdate: the elector's birthdate
-        - password: the elector's password
     """
     elector = add_elector(dni, name, birthdate, password)
     if elector is None:

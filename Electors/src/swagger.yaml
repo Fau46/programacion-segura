@@ -31,9 +31,78 @@ paths:
       responses:
         200:
           description: Check OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
         400:
           description: Wrong credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
 
+  /electors:
+    post:
+      summary: New elector
+      operationId: app.new_elector
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Elector'
+      responses:
+        201:
+          description: Elector added
+        500:
+          description: An error occured
+
+  /electors/{dni}:
+    get:
+      summary: Elector's Info
+      operationId: app.get_elector
+      parameters:
+        - in: path
+          name: dni
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Elector's Info
+        404:
+          description: An error occured
+
+  /users:
+    post:
+      summary: New user
+      operationId: app.new_user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        201:
+          description: User added
+        500:
+          description: An error occured
+
+  /users/{dni}:
+    get:
+      summary: User's Info
+      operationId: app.get_user
+      parameters:
+        - in: path
+          name: dni
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: User added
+        404:
+          description: An error occured
 
 components:
   schemas:
@@ -56,3 +125,64 @@ components:
           type: string
           description: Error description
           example: None is not of type 'string'
+    Elector:
+      type: object
+      required:
+        - dni
+        - firstname
+        - lastname
+        - dateofbirth
+      properties:
+        dni:
+          minLength: 1
+          type: string
+          description: Elector's DNI
+          example: "1234567890"
+        firstname:
+          minLength: 1
+          type: string
+          description: Elector's firstname
+          example: "Giuseppe"
+        lastname:
+          minLength: 1
+          type: string
+          description: Elector's lastname
+          example: "Garibaldi"
+        dateofbirth:
+          type: string
+          format: date-time
+          description: Elector's date of birth
+          example: "1960-11-10T10:30:00+1:00"
+        can_vote:
+          example: true
+          type: boolean
+    User:
+      type: object
+      required:
+        - username
+        - password
+        - dni
+      properties:
+        username:
+          minLength: 1
+          type: string
+          description: User's firstname
+          example: "Giuseppe"
+        password:
+          minLength: 1
+          type: string
+          description: User's password
+          example: "Garibaldi"
+        dni:
+          minLength: 1
+          type: string
+          description: Elector's DNI
+          example: "1234567890"
+    Status:
+      type: object
+      properties:
+        status:
+          type: boolean
+          description: Operation's status
+          example: true
+        
