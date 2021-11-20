@@ -44,7 +44,7 @@ def log_admin():
 
 def check_credentials(username="Admin", password="Admin"):
     if username == "Admin" and password == "Admin":
-        return True 
+        return {"status":True},200
     user = User.query.filter_by(username=username).first()
     if user is not None:
         if user.password == password:
