@@ -7,7 +7,7 @@ import hashlib
 from flask_cors import CORS
 
 from flask import current_app, request, jsonify
-from src.errors import Error500
+from src.errors import Error500, Error400, Error404
 
 from orm import Elector, User, db
 from utils import *
@@ -45,12 +45,15 @@ def log_admin():
 
 def check_credentials(username="Admin", password="Admin"):
     if username == "Admin" and password == "Admin":
-        return jsonify({"status":True}),200
+        return User.query.filter_by(username="Admin").first().to_json(),200
     user = User.query.filter_by(username=username).first()
     if user is not None:
         if user.password == password:
-            return jsonify({"status":True}),200
-    return jsonify({"status":False}),400
+            return  user.to_json(),200
+        else:
+            return Error400("Wrong Password").get()
+    else:
+        return Error400("User Not Found").get()
 
 def can_vote(dni, allowed):
     query = "UPDATE elector SET can_vote ="+str(allowed)+" WHERE dni="+str(dni)
@@ -59,7 +62,7 @@ def can_vote(dni, allowed):
         db.engine.execute(query)
         return 200
     except Exception as e:
-        return Error500("Error updating elector").get()
+        return Error500().get()
 
 def get_elector(dni):
     """
@@ -71,12 +74,12 @@ def get_elector(dni):
     query = "SELECT * FROM elector WHERE dni="+str(dni)
     
     result = db.engine.execute(query)
-    result = [row for row in result]
+    result = [dict(row.items()) for row in result]
 
     if len(result) == 0:
         return errors.Error404("Elector not Found").get()
     else:
-        return jsonify(result), 200 #may return all user if sqlinjection
+        return result, 200 #may return all user if sqlinjection
 
 def new_elector():
     """
@@ -93,26 +96,28 @@ def new_elector():
     if elector is None:
         return errors.Error500().get()
     else:
-        return jsonify(elector), 201
+        return dict(elector.items()), 201
 
 def new_user():
     user = request.json
     query = "SELECT * FROM elector WHERE dni="+str(user["dni"])
     
     result = db.engine.execute(query)
-    result = [row for row in result]
+    result = [dict(row.items()) for row in result]
+
+    print(result)
 
     if len(result) == 0:
         logging.info("- Service: Elector not found")
         return errors.Error404("Elector not found").get()
 
-    elector_id = result[0]["elector_id"]
+    elector_id = result[0]["id"]
 
     user = add_user(user["username"], user["password"], elector_id)
     if user is None:
         return errors.Error500().get()
     else:
-        return jsonify((user,result)), 200 #may return all user if sqlinjection
+        return (dict(user.items()),result), 200 #may return all user if sqlinjection
 
 def get_user(dni):
     """
@@ -125,20 +130,12 @@ def get_user(dni):
     
     result = db.engine.execute(query)
     result = [dict(row.items()) for row in result]
-    print(result)
 
     if len(result) == 0:
         return errors.Error404("User not Found").get()
     else:
         return result, 200 #may return all user if sqlinjection
         
-
-def time():
-    #new_user("2 OR 1=1","Admin",1)
-    print(get_elector("2 OR 1=1"))
-    print(can_vote("2 OR 1=1", False))
-    print(get_elector("2 OR 1=1"))
-
 def get_config(configuration=None):
     """ Returns a json file containing the configuration to use in the app
 
