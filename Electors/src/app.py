@@ -4,6 +4,7 @@ import connexion
 import sys
 from datetime import datetime
 import hashlib
+from flask_cors import CORS
 
 from flask import current_app, request
 from src.errors import Error500
@@ -215,6 +216,7 @@ def create_app(configuration=None):
     logging.basicConfig(level=logging.INFO)
 
     app = connexion.App(__name__)
+    CORS(app)
     app.add_api('./swagger.yaml')
     # set the WSGI application callable to allow using uWSGI:
     # uwsgi --http :8080 -w app
