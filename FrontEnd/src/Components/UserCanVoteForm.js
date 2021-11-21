@@ -1,9 +1,11 @@
 import React from "react"
-import { Form, Input, Button, Modal, Card, DatePicker } from 'antd';
+import { Form, Input, Button, Modal, Card, DatePicker, Select } from 'antd';
 import Session from "../Session/Session";
 import {  Redirect } from 'react-router-dom';
 
-export default class RegisterElectorForm extends React.Component{
+const { Option } = Select;
+
+export default class UserCanVoteForm extends React.Component{
 
   constructor(props){
     super(props);
@@ -15,20 +17,22 @@ export default class RegisterElectorForm extends React.Component{
   }
   
    async onFinish (values){ 
+
     const requestOptions = {
-      method: 'POST',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values)
     };
 
-    var call = await fetch(this.props.url+"/"+this.props.endpoint, requestOptions);
+    var endpoint = this.props.endpoint.replace("{dni}", values.dni)
+
+    var call = await fetch(this.props.url+"/"+endpoint+"?allowed="+values.allowed, requestOptions);
     var response = await call.json();
     
 
-    if(call.status == 201){
+    if(call.status == 200){
       Modal.success({
         title: 'Success',
-        content: values.firstname+" "+values.lastname+" has been registered",
+        content: "User's voting right modified",
       });
     }
     else{
@@ -56,22 +60,6 @@ export default class RegisterElectorForm extends React.Component{
             autoComplete="off"
           >
             <Form.Item
-              label="Firstname"
-              name="firstname"
-              rules={[{ required: true, message: 'Please input your firstname!' }]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              label="Lastname"
-              name="lastname"
-              rules={[{ required: true, message: 'Please input your lastname!' }]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
               label="DNI"
               name="dni"
               rules={[{ required: true, message: 'Please input your dni!' }]}
@@ -80,11 +68,14 @@ export default class RegisterElectorForm extends React.Component{
             </Form.Item>
 
             <Form.Item
-              label="Birthday"
-              name="dateofbirth"
-              rules={[{ required: true, message: 'Please input your birthday!' }]}
+              label="Voting right"
+              name="allowed"
+              rules={[{ required: true, message: 'Please input voting right!' }]}
             >
-              <DatePicker />
+              <Select className="select-after">
+                <Option value={true}>Can Vote</Option>
+                <Option value={false}>Cannot Vote</Option>
+              </Select>
             </Form.Item>
 
            

@@ -1,7 +1,7 @@
 import React from "react"
 import { Form, Input, Button, Space, Card, Modal } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import Session from "react-session-api";
+import Session from "../Session/Session";
 import { Redirect } from 'react-router-dom';
 
 
@@ -20,12 +20,8 @@ export default class LoginForm extends React.Component{
     var call = await fetch(this.props.url+"/"+this.props.endpoint+"?username="+values.username+"&password="+values.password);
     var response = await call.json();
 
-    console.log(Session.get("dni"))
-
     if(call.status == 200){
-      Session.set("dni", response[0].dni)
-      Session.set("is_admin", response[0].is_admin)
-      
+      Session.set(response[0])      
 
       this.setState({
         redirect: true,
@@ -40,12 +36,16 @@ export default class LoginForm extends React.Component{
   };
 
   render(){
-    if(this.state.redirect == true || Session.get("dni") != ""){      
-      return(<Redirect push to={`/home`}/>)
+    if(this.state.redirect == true || Session.get("dni") != undefined){      
+      if(Session.get("is_admin") == 1){
+        return(<Redirect push to={`/admin/home`}/>)
+      }
+      else{
+        return(<Redirect push to={`/home`}/>)
+      }
     }
     
     return (
-      
       <div className="site-card-border-less-wrapper">
         <Card title={this.props.title} bordered={false} style={{ width: 300 }}>
           <Form
