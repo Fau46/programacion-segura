@@ -3,7 +3,7 @@ import { Form, Input, Button, Modal, Card } from 'antd';
 import Session from "react-session-api";
 import {  Redirect } from 'react-router-dom';
 
-export default class RegisterUserForm extends React.Component{
+export default class RegisterElectorForm extends React.Component{
 
   constructor(props){
     super(props);
