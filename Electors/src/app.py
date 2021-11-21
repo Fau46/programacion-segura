@@ -30,7 +30,7 @@ DEFAULT_CONFIGURATION = {
 }
 
 def initialise():
-    admin = add_elector("Admin","Admin","1990-01-01","1abc")
+    admin = add_elector("Admin","Admin","1990-01-01","0")
     add_user("Admin","Admin",admin["id"],True)
 
     e1 = add_elector("elector1","elector1","1990-01-01","1")
@@ -264,20 +264,27 @@ B105    hardcoded_password_string
 B106    hardcoded_password_funcarg
 B107    hardcoded_password_default
 B110    try_except_pass
+
 B201    flask_debug_true
 
+B307    eval
+
 PASSWORD IN CHIARO NOT DETECTED
+
+************************************************************************************************************************
+************************************************************************************************************************
+************************************************************************************************************************
 
 B102    exec_used
 B103    set_bad_file_permissions
 B108    hardcoded_tmp_directory
 B112    try_except_continue
+
 B301    pickle
 B302    marshal
 B304    ciphers
 B305    cipher_modes
 B306    mktemp_q
-B307    eval
 B308    mark_safe
 B309    httpsconnection
 B310    urllib_urlopen
@@ -294,6 +301,7 @@ B321    ftplib
 B323    unverified_context
 B324    hashlib_new_insecure_functions
 B325    tempnam
+
 B401    import_telnetlib
 B402    import_ftplib
 B403    import_pickle
@@ -307,6 +315,7 @@ B410    import_lxml
 B411    import_xmlrpclib
 B412    import_httpoxy
 B413    import_pycrypto
+
 B501    request_with_no_cert_validation
 B502    ssl_with_bad_version
 B503    ssl_with_bad_defaults
@@ -314,6 +323,7 @@ B504    ssl_with_no_version
 B505    weak_cryptographic_key
 B506    yaml_load
 B507    ssh_no_host_key_verification
+
 B601    paramiko_calls
 B602    subprocess_popen_with_shell_equals_true
 B603    subprocess_without_shell_equals_true
@@ -323,8 +333,14 @@ B606    start_process_with_no_shell
 B607    start_process_with_partial_path
 B608    hardcoded_sql_expressions
 B609    linux_commands_wildcard_injection
+
+
+************************************************************************************************************************
+************************************************************************************************************************
+************************************************************************************************************************
 B610    django_extra_used
 B611    django_rawsql_used
+
 B701    jinja2_autoescape_false
 B702    use_of_mako_templates
 B703    django_mark_safe
