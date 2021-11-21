@@ -9,8 +9,9 @@ import RegisterUser from "./Pages/RegisterUserPage"
 import UserCanVotePage from "./Pages/UserCanVotePage";
 import UserHome from "./Pages/UserHomePage";
 
-
-const URL_electors = "http://localhost:42424"
+const URL_base = "http://localhost"
+const URL_electors = URL_base+":42424"
+const URL_elections = URL_base+":42423"
 
 export default class RouterPages extends React.Component{ 
   
@@ -26,7 +27,7 @@ export default class RouterPages extends React.Component{
             <Route path="/admin/home" render={() => <AdminHome title="Welcome"/>} />
             <Route path="/admin/user/can_vote" render={() => <UserCanVotePage url={URL_electors} endpoint={"users/{dni}/vote"} title={"Elector voting right"}/>} />
             <Route path="/admin/register/elector" render={() => <RegisterElector url={URL_electors} endpoint={"electors"} title={"Elector Registration"}/>} />
-            <Route path="/candiates" render={() => <CandidatesPage url={URL_electors} endpoint={"electors"} title={"Elector Registration"}/>} />
+            <Route path="/candidates" render={() => <CandidatesPage url={URL_elections} endpoint={"candidates"}/>} />
             <Route path="/home" render={() => <UserHome title="Welcome"/>} />
           </Switch>
         </Layout>

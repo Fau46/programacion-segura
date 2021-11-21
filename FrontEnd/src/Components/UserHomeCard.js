@@ -12,7 +12,6 @@ export default class UserHomeCard extends React.Component{
   }
 
   redirect(page){
-    console.log(page)
     this.setState({
       redirect: page
     })
@@ -29,7 +28,7 @@ export default class UserHomeCard extends React.Component{
           <Card title={this.props.title} bordered={false} style={{ width: 300 }}>
             <Space direction="vertical">
               
-              <Button type="primary" icon={<DownloadOutlined />} onClick={() => this.redirect("/admin/user/can_vote")}>
+              <Button type="primary" icon={<DownloadOutlined />} onClick={() => this.redirect("/candidates")}>
                 Vote
               </Button>
 
