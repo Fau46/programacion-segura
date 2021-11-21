@@ -2,10 +2,12 @@ from flask import current_app
 from orm import Candidate, Vote, db
 import requests as req
 
+from werkzeug.security import generate_password_hash
+
 def get_from(url, params=None):
     try:
         if params is not None:
-            r = req.get(url, timeout=2, params=params, verify=False)
+            r = req.get(url, timeout=2, params=params)
         else:
             r = req.get(url, timeout=2)
         try:
@@ -44,7 +46,7 @@ def add_candidate(dni, party):
 def add_vote(elector_id, candidate_id):
     new_vote = Vote()
     try:
-        new_vote.elector_id = elector_id 
+        new_vote.elector_id = generate_password_hash(elector_id)
         new_vote.candidate_id = candidate_id
         db.session.add(new_vote)
         db.session.commit()

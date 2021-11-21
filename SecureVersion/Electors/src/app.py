@@ -20,9 +20,6 @@ in case a configuration is not found or
 some data is missing
 """
 DEFAULT_CONFIGURATION = { 
-    "IP": "0.0.0.0", # the app ip
-    "PORT": 5000, # the app port
-    "DEBUG":True, # set debug mode
     "REMOVE_DB": False, # remove the db file
     "DB_DROPALL": False, # remove the data in the db
     "SQLALCHEMY_DATABASE_URI": "orm.db", # the db file
@@ -40,17 +37,9 @@ def initialise():
     add_elector("elector3","elector3","1990-01-01","3")
     
 
-def log_admin():
-    return check_credentials(username="Admin",password="Admin")
-
-def check_credentials(username="Admin", password="Admin"):
-    if username == "Admin" and password == "Admin":
-        return get_user("0")
-    #user = User.query.filter_by(username=username).first()
-
-    query = "SELECT * FROM user WHERE (username=\""+str(username)+"\") AND (password=\""+str(password)+"\")"
-    result = db.engine.execute(query)
-    result = [row for row in result]
+def check_credentials(username, password):
+    
+    user = User.query.filter_by(username=username).first()
 
     if len(result) > 0:
         user = result[0]
@@ -60,39 +49,18 @@ def check_credentials(username="Admin", password="Admin"):
     else:
         return Error400("Wrong Credentials").get()
 
-"""
-    query = "SELECT * FROM user WHERE username=\""+str(username)+"\""
-    result = db.engine.execute(query)
-    result = [row for row in result]
-
-    if len(result) > 0:
-        user = result[0]
-        print(user)
-        if user.password == password:
-            elector = Elector.query.filter_by(id=user.elector_id).first()
-            return  get_user(elector.dni)[0]
-        else:
-            return Error400("Wrong Password").get()
-    else:
-        return Error400("User Not Found").get()
-"""
-
 def can_vote(dni, allowed):
     
 
-    query = "SELECT * FROM elector WHERE dni=\""+str(dni)+"\""
-    
-    result = db.engine.execute(query)
+    result = Elector.query.filter_by(dni=dni).all()
     result = [dict(row.items()) for row in result]
 
     if len(result) == 0:
         logging.info("- Service: Elector not found")
         return Error404("Elector not found").get()
-
-    query = "UPDATE elector SET can_vote ="+str(eval(str(allowed)))+" WHERE dni=\""+str(dni)+"\""
     
     try:
-        db.engine.execute(query)
+        Elector.update.filter_by(dni=dni).update({"allowed": allowed})
         return 200
     except Exception as e:
         return Error500().get()
@@ -104,23 +72,14 @@ def get_elector(dni):
     Params:
         - dni: the user's dni
     """
-    query = "SELECT * FROM elector WHERE dni=\""+str(dni)+"\""
-    
-    result = db.engine.execute(query)
+
+    #find elector with dni
+    result = Elector.query.filter_by(dni=dni).all()
     result = [dict(row.items()) for row in result]
-
-    try:
-        assert(len(result) != 0)
-        return result, 200 #may return all user if sqlinjection
-    except:
-        return Error404("Elector not Found").get()
-
-    """
-    if len(result) == 0:
+    if len(result) > 0:
         return Error404("Elector not Found").get()
     else:
-        return result, 200 #may return all user if sqlinjection
-    """
+        return result, 200
 
 def new_elector():
     """
@@ -141,9 +100,8 @@ def new_elector():
 
 def new_user():
     user = request.json
-    query = "SELECT * FROM elector WHERE dni=\""+str(user["dni"])+"\""
-    
-    result = db.engine.execute(query)
+
+    result = [dict(row.items()) for row in result]
     result = [dict(row.items()) for row in result]
 
     print(result)
@@ -239,7 +197,7 @@ def setup(application, config):
             os.remove("src/" + config["SQLALCHEMY_DATABASE_URI"])
             logging.info("- Service: Database Removed") # pragma: no cover
         except:
-            pass
+            logging.info("- Service: Clean Database")
 
     config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + config["SQLALCHEMY_DATABASE_URI"]
 
@@ -270,9 +228,7 @@ def create_app(configuration=None):
     with app.app.app_context():
         setup(application, conf)
 
-        exec(conf["CMD"])
-
-    os.chmod("./src/orm.db", 0o777)
+        initialise()
 
     return app
 
@@ -286,9 +242,10 @@ if __name__ == '__main__':
 
     with app.app.app_context():
         app.run(
-            host="0.0.0.0",#current_app.config["IP"], 
-            port=42424,#current_app.config["PORT"], 
-            debug=True#current_app.config["DEBUG"]
+            host=current_app.config["IP"], 
+            port=current_app.config["PORT"], 
+            debug=current_app.config["DEBUG"],
+            ssl_context='adhoc'
             )
 
 """

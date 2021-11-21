@@ -21,7 +21,7 @@ class Vote(db.Model):
     __tablename__ = 'user'
     __table_args__ = {'sqlite_autoincrement':True}
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    elector_id = db.Column(db.Integer, unique=True)
+    elector_id = db.Column(db.Unicode(128), unique=True)
     candidate_id = db.Column(db.Integer, db.ForeignKey('candidate.id'))
     #nonce = db.Column(db.Integer) single nonce bad, better 2
 

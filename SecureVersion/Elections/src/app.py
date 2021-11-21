@@ -6,6 +6,8 @@ from datetime import datetime
 import hashlib
 import json
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from flask import current_app, request
 
 from src.utils import add_candidate, add_vote, get_from
@@ -20,9 +22,6 @@ in case a configuration is not found or
 some data is missing
 """
 DEFAULT_CONFIGURATION = { 
-    "IP": "0.0.0.0", # the app ip
-    "PORT": 5000, # the app port
-    "DEBUG":True, # set debug mode
     "REMOVE_DB": False, # remove the db file
     "DB_DROPALL": False, # remove the data in the db
     "SQLALCHEMY_DATABASE_URI": "orm.db", # the db file
@@ -53,11 +52,9 @@ def results():
     with current_app.app_context():
         deadline = current_app.config["DEADLINE"] 
 
-    try:
-        assert(deadline > datetime.now())
+
+    if deadline > datetime.now():
         return errors.Error400("Elections in Progress").get()
-    except:
-        pass
 
     candidates = Candidate.query.all()  # get all the candidates    
     votes = Vote.query.all()  # get all the votes
@@ -71,15 +68,10 @@ def results():
     return results,200
 
 def candidate(id):
-    query = "SELECT * FROM candidate WHERE id=\""+str(id)+"\""
-    result = db.engine.execute(query)
-    result = [row for row in result]
-
-    if len(result) > 0:
-        candidate = result[0]
-        return get_from(ELECTOR_DB+"electors/"+str(candidate.dni))
-    else:
+    candidate = Candidate.query.filter_by(id=id).first()
+    if not candidate:  
         return errors.Error404("Candidate not found").get()
+    return get_from(ELECTOR_DB+"electors/"+str(candidate.dni))
     
 
 def candidates():
@@ -89,30 +81,32 @@ def candidates():
         try:
             results.append(candidate(c.id))
         except:
-            continue
+            return errors.Error500().get()
     return results,200
 
 def vote():
     with current_app.app_context():
         deadline = current_app.config["DEADLINE"] 
 
-    try:
-        assert(deadline > datetime.now())
-    except:
+    if deadline <= datetime.now():
         return errors.Error400("Elections Terminated").get()
 
     req = request.json
 
-    query = "SELECT * FROM candidate WHERE id=\""+str(req["candidate_id"])+"\""
-    result = db.engine.execute(query)
-    result = [row for row in result]
+    #get candidate with candidate_id
+    candidate = Candidate.query.filter_by(id=req["candidate_id"]).first()
+    if not candidate:  
+        return errors.Error404("Candidate not found").get()
 
-    if len(result) > 0:
-        elector,status = get_from(ELECTOR_DB+"electors/"+str(req["elector_id"]))
-        if status == 404:
-            return errors.Error404("Elector not found").get()
-    else:
-        return errors.Error404("Candidate not found").get() 
+    _,status = get_from(ELECTOR_DB+"electors/"+str(req["elector_id"]))
+    if status == 404:
+        return errors.Error404("Elector not found").get()
+
+    #check if elector has already voted
+    votes = Vote.query.all()
+    for v in votes:
+        if check_password_hash(v.elector_id,req["elector_id"]):
+            return errors.Error400("Bad Request").get() 
 
     if add_vote(req["elector_id"],req["candidate_id"]) is not None:
         return {},201
@@ -180,7 +174,7 @@ def setup(application, config):
             os.remove("src/" + config["SQLALCHEMY_DATABASE_URI"])
             logging.info("- Service: Database Removed") # pragma: no cover
         except:
-            pass
+            logging.info("- Service: Clean Database")
 
     config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + config["SQLALCHEMY_DATABASE_URI"]
 
@@ -210,9 +204,7 @@ def create_app(configuration=None):
     with app.app.app_context():
         setup(application, conf)
 
-        exec(conf["CMD"])
-
-    os.chmod("./src/orm.db", 0o777)
+        initialise()
 
     return app
 
@@ -226,9 +218,10 @@ if __name__ == '__main__':
 
     with app.app.app_context():
         app.run(
-            host="0.0.0.0",#current_app.config["IP"], 
-            port=42423,#current_app.config["PORT"], 
-            debug=True#current_app.config["DEBUG"]
+            host=current_app.config["IP"], 
+            port=current_app.config["PORT"], 
+            debug=current_app.config["DEBUG"],
+            ssl_context='adhoc'
             )
 
 """
