@@ -68,24 +68,6 @@ def results():
     return results,200
 
 def candidate(id):
-    query = "SELECT * FROM candidate WHERE id=\""+str(id)+"\""
-    result = db.engine.execute(query)
-    result = [row for row in result]
-
-    if len(result) > 0:
-        candidate = result[0]
-        elector, status = get_from(ELECTOR_DB+"electors/"+str(candidate.dni))
-        if status == 200:
-            elector = elector[0]
-            elector["party"] = candidate.party
-            elector["id"] = candidate.id
-        print(elector)
-        return elector, status
-    else:
-        return errors.Error404("Candidate not found").get()
-    
-
-def candidate(id):
     candidate = Candidate.query.filter_by(id=id).first()
     if not candidate:  
         return errors.Error404("Candidate not found").get()
@@ -108,7 +90,7 @@ def candidates():
             cand, _ = candidate(c.id)
             results.append(cand)
         except:
-            continue
+            return errors.Error500().get()
     return results,200
 
 def vote():

@@ -4,6 +4,8 @@ from orm import Elector, User, db
 import hashlib
 import random
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
 def add_elector(firstname, lastname, dateofbirth, dni):
     new_elector = Elector()
     try:
@@ -23,8 +25,8 @@ def add_user(username, password, elector_id, is_admin=False):
     new_user = User()
     try:
         #new_user.nonce = random.randint(0, 1000000)
-        new_user.username = username
-        new_user.password = password #hashlib.md5((password+str(new_user.nonce)).encode()).hexdigest() #insicure hashing
+        new_user.username = generate_password_hash(username)
+        new_user.password = generate_password_hash(password)
         new_user.elector_id = elector_id
         new_user.is_admin = is_admin
         db.session.add(new_user)

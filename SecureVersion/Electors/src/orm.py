@@ -28,7 +28,6 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.Unicode(128), unique=True)
     password = db.Column(db.Unicode(128))
-    #nonce = db.Column(db.Integer)
     elector_id = db.Column(db.Integer, db.ForeignKey('elector.id'))
     is_admin = db.Column(db.Boolean, default=False)
 

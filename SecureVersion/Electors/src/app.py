@@ -10,6 +10,8 @@ from flask_cors import CORS
 from flask import current_app, request, jsonify
 from src.errors import Error500, Error400, Error404
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from src.orm import Elector, User, db
 from src.utils import add_elector, add_user
 import os
@@ -38,31 +40,31 @@ def initialise():
     
 
 def check_credentials(username, password):
-    
-    user = User.query.filter_by(username=username).first()
 
-    if len(result) > 0:
-        user = result[0]
-        print(user)
-        elector = Elector.query.filter_by(id=user.elector_id).first()
-        return  get_user(elector.dni)[0]
-    else:
-        return Error400("Wrong Credentials").get()
+    users = User.query.all()
+    for u in users:
+        if check_password_hash(u.username,username): 
+            if check_password_hash(u.password,password):
+                elector = Elector.query.filter_by(id=u.elector_id).first()
+                return get_user(elector.dni)
+    return Error400("Wrong Credentials").get()
 
+        
 def can_vote(dni, allowed):
     
+    elector = Elector.query.filter_by(dni=dni).first()
 
-    result = Elector.query.filter_by(dni=dni).all()
-    result = [dict(row.items()) for row in result]
-
-    if len(result) == 0:
+    if elector is None:
         logging.info("- Service: Elector not found")
         return Error404("Elector not found").get()
     
     try:
-        Elector.update.filter_by(dni=dni).update({"allowed": allowed})
-        return 200
+        elector.can_vote = allowed
+        db.session.commit()
+        return get_elector(dni)
     except Exception as e:
+        print(e)
+        db.session.rollback()
         return Error500().get()
 
 def get_elector(dni):
@@ -75,8 +77,9 @@ def get_elector(dni):
 
     #find elector with dni
     result = Elector.query.filter_by(dni=dni).all()
-    result = [dict(row.items()) for row in result]
-    if len(result) > 0:
+    result = [row.to_json() for row in result]
+    print(result)
+    if len(result) == 0:
         return Error404("Elector not Found").get()
     else:
         return result, 200
@@ -101,22 +104,19 @@ def new_elector():
 def new_user():
     user = request.json
 
-    result = [dict(row.items()) for row in result]
-    result = [dict(row.items()) for row in result]
+    elector = Elector.query.filter_by(dni=user["dni"]).first()
 
-    print(result)
-
-    if len(result) == 0:
+    if elector is None:
         logging.info("- Service: Elector not found")
         return Error404("Elector not found").get()
 
-    elector_id = result[0]["id"]
-
-    user = add_user(user["username"], user["password"], elector_id)
-    if user is None:
-        return Error500().get()
+    users = User.query.all()
+    for u in users:
+        if check_password_hash(u.username,user["username"]):
+            return Error500().get()
     else:
-        return get_user(result[0]["dni"])
+        user = add_user(user["username"], user["password"], elector.id)
+        return get_user(elector.dni)
         #return (dict(user.items()),result), 200 #may return all user if sqlinjection
 
 def get_user(dni):
@@ -126,15 +126,14 @@ def get_user(dni):
     Params:
         - dni: the user's dni
     """
-    query = "SELECT user.*, elector.dni FROM elector,user WHERE elector.id = user.elector_id AND elector.dni=\""+str(dni)+"\""
-    
-    result = db.engine.execute(query)
-    result = [dict(row.items()) for row in result]
 
-    if len(result) == 0:
-        return Error404("User not Found").get()
-    else:
-        return result, 200 #may return all user if sqlinjection
+    #find elector with dni
+    elector = Elector.query.filter_by(dni=dni).first()
+    if elector is not None:
+        user = User.query.filter_by(elector_id=elector.id).first()
+        return user.to_json(), 200
+
+    return Error404("User not Found").get()
         
 def get_config(configuration=None):
     """ Returns a json file containing the configuration to use in the app
