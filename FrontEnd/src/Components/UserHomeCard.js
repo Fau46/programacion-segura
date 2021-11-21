@@ -28,13 +28,18 @@ export default class UserHomeCard extends React.Component{
       <div className="site-card-border-less-wrapper">
           <Card title={this.props.title} bordered={false} style={{ width: 300 }}>
             <Space direction="vertical">
-              {/* <Button type="primary" icon={<DownloadOutlined />} onClick={() => this.redirect("/admin/register/elector")}>
-                Register elector
+              
+              <Button type="primary" icon={<DownloadOutlined />} onClick={() => this.redirect("/admin/user/can_vote")}>
+                Vote
               </Button>
 
               <Button type="primary" icon={<DownloadOutlined />} onClick={() => this.redirect("/admin/user/can_vote")}>
-                Electors vote right
-              </Button> */}
+                Results
+              </Button>
+
+              <Button type="primary" icon={<DownloadOutlined />} onClick={() => this.redirect("/admin/register/elector")}>
+                Comments
+              </Button>
             </Space>
           </Card>
       </div>
