@@ -77,7 +77,13 @@ def candidate(id):
 
     if len(result) > 0:
         candidate = result[0]
-        return get_from(ELECTOR_DB+"electors/"+str(candidate.dni))
+        elector, status = get_from(ELECTOR_DB+"electors/"+str(candidate.dni))
+        if status == 200:
+            elector = elector[0]
+            elector["party"] = candidate.party
+            elector["id"] = candidate.id
+        print(elector)
+        return elector, status
     else:
         return errors.Error404("Candidate not found").get()
     
@@ -87,7 +93,8 @@ def candidates():
     results = []
     for c in candidates:
         try:
-            results.append(candidate(c.id))
+            cand, _ = candidate(c.id)
+            results.append(cand)
         except:
             continue
     return results,200
