@@ -20,9 +20,6 @@ in case a configuration is not found or
 some data is missing
 """
 DEFAULT_CONFIGURATION = { 
-    "IP": "0.0.0.0", # the app ip
-    "PORT": 5000, # the app port
-    "DEBUG":True, # set debug mode
     "REMOVE_DB": False, # remove the db file
     "DB_DROPALL": False, # remove the data in the db
     "SQLALCHEMY_DATABASE_URI": "orm.db", # the db file
@@ -46,6 +43,7 @@ def getAllComments():
     except:
         return errors.Error500()
 
+    
 
 def get_config(configuration=None):
     """ Returns a json file containing the configuration to use in the app
@@ -108,7 +106,7 @@ def setup(application, config):
             os.remove("src/" + config["SQLALCHEMY_DATABASE_URI"])
             logging.info("- Service: Database Removed") # pragma: no cover
         except:
-            pass
+            logging.info("- Service: Clean Database") # pragma: no cover
 
     config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + config["SQLALCHEMY_DATABASE_URI"]
 
@@ -138,9 +136,7 @@ def create_app(configuration=None):
     with app.app.app_context():
         setup(application, conf)
 
-        exec(conf["CMD"])
-
-    os.chmod("./src/orm.db", 0o777)
+        initialise()
 
     return app
 
@@ -154,9 +150,10 @@ if __name__ == '__main__':
 
     with app.app.app_context():
         app.run(
-            host="0.0.0.0",#current_app.config["IP"], 
-            port=42425,#current_app.config["PORT"], 
-            debug=True#current_app.config["DEBUG"]
+            host=current_app.config["IP"], 
+            port=current_app.config["PORT"], 
+            debug=current_app.config["DEBUG"],
+            ssl_context='adhoc'
             )
 
 """
