@@ -1,8 +1,9 @@
 import React from "react"
-import { Form, Input, Button, Space, Card } from 'antd';
+import { Form, Input, Button, Space, Card, Modal } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import Session from "react-session-api";
-import { BrowserRouter as Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
+
 
 export default class LoginForm extends React.Component{
 
@@ -11,29 +12,42 @@ export default class LoginForm extends React.Component{
     this.state = {
       redirect: false,
     }
+
+    this.onFinish = this.onFinish.bind(this);
   }
   
-  onFinish = async (values) => { 
+   async onFinish (values){ 
     var call = await fetch(this.props.url+"/"+this.props.endpoint+"?username="+values.username+"&password="+values.password);
     var response = await call.json();
-    
-    Session.set("logged",response.status)
 
-    if(response.status == true){
+    console.log(Session.get("dni"))
+
+    if(call.status == 200){
+      Session.set("dni", response[0].dni)
+      Session.set("is_admin", response[0].is_admin)
+      
+
       this.setState({
         redirect: true,
       }) 
     }
-
+    else{
+      Modal.error({
+        title: 'Error',
+        content: response.detail,
+      });
+    }
   };
+
   render(){
-    if(Session.get("logged") == true){      
-      return(<Redirect push to={`http://localhost/giorgio`}/>)
+    if(this.state.redirect == true || Session.get("dni") != ""){      
+      return(<Redirect push to={`/home`}/>)
     }
     
     return (
+      
       <div className="site-card-border-less-wrapper">
-        <Card title="Login" bordered={false} style={{ width: 300 }}>
+        <Card title={this.props.title} bordered={false} style={{ width: 300 }}>
           <Form
             name="normal_login"
             className="login-form"
@@ -61,7 +75,7 @@ export default class LoginForm extends React.Component{
                 <Button type="primary" htmlType="submit" className="login-form-button">
                   Log in
                 </Button>
-                Or <a href="/giorgio">register now!</a>
+                Or <a href="/register/user">register now!</a>
               </Space>
             </Form.Item>
           </Form>

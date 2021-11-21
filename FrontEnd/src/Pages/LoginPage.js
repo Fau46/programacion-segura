@@ -7,6 +7,6 @@ import LoginLayout from "../Layout/LoginLayout"
 
 export default function Login(props){
   return(
-      <LoginLayout login={<LoginForm  url={props.url} endpoint={props.endpoint}/>} />
+      <LoginLayout login={<LoginForm  url={props.url} endpoint={props.endpoint} title={props.title}/>} />
   )
 }
