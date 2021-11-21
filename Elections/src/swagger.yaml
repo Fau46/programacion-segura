@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: SmartCam 
-  description: SmartCam REST API
+  title: Service 
+  description: Service REST API
   version: "0.1"
 servers:
 - url: /
