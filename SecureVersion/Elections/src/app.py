@@ -52,20 +52,27 @@ def results():
     with current_app.app_context():
         deadline = current_app.config["DEADLINE"] 
 
-
-    if deadline > datetime.now():
+    try:
+        assert(deadline > datetime.now())
         return errors.Error400("Elections in Progress").get()
+    except:
+        pass
 
-    candidates = Candidate.query.all()  # get all the candidates    
+    cs = Candidate.query.all()  # get all the candidates    
     votes = Vote.query.all()  # get all the votes
     results = {}
-    for c in candidates:
+    for c in cs:
         results[c.id] = 0
     print(results)
     for v in votes:
         results[v.candidate_id] += 1
+
+    ls = []
+    for c,v in results.items():
+        cand, status = candidate(c)
+        ls.append((cand,v))
     
-    return results,200
+    return ls,200
 
 def candidate(id):
     candidate = Candidate.query.filter_by(id=id).first()
