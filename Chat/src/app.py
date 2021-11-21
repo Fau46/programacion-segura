@@ -5,6 +5,7 @@ import sys
 from datetime import datetime
 import hashlib
 import json
+from flask_cors import CORS
 
 from flask import current_app, request
 
@@ -131,6 +132,7 @@ def create_app(configuration=None):
     # set the WSGI application callable to allow using uWSGI:
     # uwsgi --http :8080 -w app
     application = app.app
+    CORS(application)
 
     conf = get_config(configuration)
     logging.info(conf)
