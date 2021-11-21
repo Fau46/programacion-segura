@@ -1,6 +1,6 @@
 import React from "react"
 import { Form, Input, Button, Modal, Card } from 'antd';
-import Session from "react-session-api";
+import Session from "../Session/Session";
 import {  Redirect } from 'react-router-dom';
 
 export default class RegisterUserForm extends React.Component{
@@ -20,15 +20,12 @@ export default class RegisterUserForm extends React.Component{
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values)
     };
-    console.log(requestOptions)
-    // return;
+
     var call = await fetch(this.props.url+"/"+this.props.endpoint, requestOptions);
     var response = await call.json();
-    console.log(call);
     
     if(call.status == 200){
-      Session.set("dni", response[0].dni)
-      Session.set("is_admin", response[0].is_admin)
+      Session.set(response[0])
       this.setState({
         redirect: true,
       }) 
@@ -42,12 +39,11 @@ export default class RegisterUserForm extends React.Component{
   };
 
   render(){
-    if(this.state.redirect == true || Session.get("dni") != ""){
+    if(this.state.redirect == true || Session.get("dni") != undefined){
       return(<Redirect push to={`/home`}/>)
     }
-    
+
     return (
-      
       <div className="site-card-border-less-wrapper">
         <Card title={this.props.title} bordered={false} style={{ width: 300 }}>
           <Form
@@ -80,9 +76,7 @@ export default class RegisterUserForm extends React.Component{
               rules={[{ required: true, message: 'Please input your password!' }]}
             >
               <Input.Password />
-            </Form.Item>
-
-           
+            </Form.Item>        
 
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit">
