@@ -91,21 +91,20 @@ def validate_auth_token(auth_token):
 
 def check_credentials(username, password):
     try:
-        users = User.query.all()
-        for u in users:
-            if check_password_hash(u.username,username): 
-                if check_password_hash(u.password,password):
-                    elector = Elector.query.filter_by(id=u.elector_id).first()
-                    print(elector)
-                    if elector:
-                        print(u.id)
-                        auth_token = encode_auth_token(u.id)
-                        print(auth_token)
-                        if auth_token:
-                            user = u.to_json()
-                            user["auth_token"] = auth_token.decode()
-                            user["dni"] = elector.dni
-                            return user, 200
+        u = User.query.filter_by(username=username).first()
+        if u:
+            if check_password_hash(u.password,password):
+                elector = Elector.query.filter_by(id=u.elector_id).first()
+                print(elector)
+                if elector:
+                    print(u.id)
+                    auth_token = encode_auth_token(u.id)
+                    print(auth_token)
+                    if auth_token:
+                        user = u.to_json()
+                        user["auth_token"] = auth_token.decode()
+                        user["dni"] = elector.dni
+                        return user, 200
         return Error400("Wrong Credentials").get()
     except Exception as e:
         return Error500().get()
@@ -192,10 +191,9 @@ def new_user():
         logging.info("- Service: Elector not found")
         return Error404("Elector not found").get()
 
-    users = User.query.all()
-    for u in users:
-        if check_password_hash(u.username,user["username"]):
-            return Error500().get()
+    u = User.query.filter_by(username=user["username"]).first()
+    if u:
+        return Error500().get()
     else:
         user = add_user(user["username"], user["password"], elector.id)
         return get_user(elector.dni)

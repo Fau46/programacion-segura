@@ -25,7 +25,7 @@ def add_user(username, password, elector_id, is_admin=False):
     new_user = User()
     try:
         #new_user.nonce = random.randint(0, 1000000)
-        new_user.username = generate_password_hash(username)
+        new_user.username = username
         new_user.password = generate_password_hash(password)
         new_user.elector_id = elector_id
         new_user.is_admin = is_admin
