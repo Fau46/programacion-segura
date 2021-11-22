@@ -5,4 +5,4 @@ flask-sqlalchemy
 flask-cors
 requests
 pyopenssl
-jwt
+Flask-JWT
