@@ -4,8 +4,9 @@ import Session from "../Session/Session"
 import { Redirect } from "react-router-dom"
 import UserHomeCard from "../Components/UserHomeCard"
 import CandidatesCard from "../Components/CandidatesCards"
+import CommentsCard from "../Components/CommentsCard"
 
-export default class CandidatesPage extends React.Component{
+export default class CommentsPage extends React.Component{
   redirect = () =>{
     return <Redirect push to={"/login"}/>
   }
@@ -13,11 +14,12 @@ export default class CandidatesPage extends React.Component{
   render(){
     const dni = Session.get("dni");
     const is_admin = Session.get("is_admin");
-    
     return(
-      <div>
-        {is_admin == 0 && dni != undefined ? <CandidatesCard url={this.props.url} endpoint={this.props.endpoint}/> : this.redirect()}
-      </div>
+      <LoginLayout login={
+       <div>
+          {is_admin == 0 && dni != undefined ? <CommentsCard url={this.props.url} endpoint={this.props.endpoint}/> : this.redirect()}
+       </div>
+      } />
     )
   }
   

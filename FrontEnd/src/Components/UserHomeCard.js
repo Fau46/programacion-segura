@@ -32,11 +32,11 @@ export default class UserHomeCard extends React.Component{
                 Vote
               </Button>
 
-              <Button type="primary" icon={<DownloadOutlined />} onClick={() => this.redirect("/admin/user/can_vote")}>
+              {/* <Button type="primary" icon={<DownloadOutlined />} onClick={() => this.redirect("/admin/user/can_vote")}>
                 Results
-              </Button>
+              </Button> */}
 
-              <Button type="primary" icon={<DownloadOutlined />} onClick={() => this.redirect("/admin/register/elector")}>
+              <Button type="primary" icon={<DownloadOutlined />} onClick={() => this.redirect("/comments")}>
                 Comments
               </Button>
             </Space>
