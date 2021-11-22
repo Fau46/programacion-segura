@@ -42,7 +42,7 @@ def initialise():
 
     if not Vote.query.all():
         logging.info("- Service: Initialising Votes...")
-        add_vote("2","1")
+        add_vote("2","2")
         add_vote("3","1")
         add_vote("4","2")
         logging.info("- Service: Votes Initialized")
