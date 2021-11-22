@@ -13,7 +13,7 @@ export default class UserHome extends React.Component{
   render(){
     const dni = Session.get("dni");
     const is_admin = Session.get("is_admin");
-    console.log(dni+" "+is_admin)
+    
     return(
       <LoginLayout login={
         <div>
