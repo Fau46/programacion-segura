@@ -32,6 +32,14 @@ class Error400(Error):
         self.status = 400
         self.detail = detail
 
+class Error401(Error):
+    def __init__(self, detail):
+        """ Invalid Token """
+        self.type = "about:blank"
+        self.title = "Invalid Token"
+        self.status = 401
+        self.detail = detail
+
 class Error404(Error):
     def __init__(self, detail):
         """ Not Found """

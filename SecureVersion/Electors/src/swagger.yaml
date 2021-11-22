@@ -8,7 +8,7 @@ servers:
 paths:
   /check_credentials:
     get:
-      summary: Check user redentials
+      summary: Check user credentials
       operationId: app.check_credentials
       parameters:
         - in: query
@@ -34,11 +34,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /check_auth_token:
+    get:
+      summary: Check user auth token
+      operationId: app.check_auth_token
+      parameters:
+        - in: header
+          name: Auth-Token
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Check OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadUser'
+        401:
+          description: Invalid Token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /electors:
     post:
       summary: New elector
       operationId: app.new_elector
+      parameters:
+        - in: header
+          name: Auth-Token
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -51,6 +80,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReadElector'
+        401:
+          description: Invalid Token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: An error occured
           content:
@@ -63,6 +98,11 @@ paths:
       summary: Elector's Info
       operationId: app.get_elector
       parameters:
+        - in: header
+          name: Auth-Token
+          required: true
+          schema:
+            type: string
         - in: path
           name: dni
           required: true
@@ -75,6 +115,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReadElector'
+        401:
+          description: Invalid Token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: An error occured
           content:
@@ -110,6 +156,11 @@ paths:
       summary: User's Info
       operationId: app.get_user
       parameters:
+        - in: header
+          name: Auth-Token
+          required: true
+          schema:
+            type: string
         - in: path
           name: dni
           required: true
@@ -122,6 +173,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReadUser'
+        401:
+          description: Invalid Token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: An error occured
           content:
@@ -134,6 +191,11 @@ paths:
       summary: Modify user's ability to vote
       operationId: app.can_vote
       parameters:
+        - in: header
+          name: Auth-Token
+          required: true
+          schema:
+            type: string
         - in: path
           name: dni
           required: true
@@ -147,6 +209,12 @@ paths:
       responses:
         200:
           description: OK Changed
+        401:
+          description: Invalid Token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: Elector Not Found
         500:

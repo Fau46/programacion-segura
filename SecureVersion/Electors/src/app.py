@@ -3,12 +3,13 @@ import logging
 from re import A
 import connexion
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 from flask_cors import CORS
+from base64 import b64encode
 
 from flask import current_app, request, jsonify
-from src.errors import Error500, Error400, Error404
+from src.errors import Error500, Error400, Error404, Error401
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -16,6 +17,7 @@ from src.orm import Elector, User, db
 from src.utils import add_elector, add_user
 import os
 import json
+import jwt
 """
 The default app configuration: 
 in case a configuration is not found or 
@@ -39,18 +41,94 @@ def initialise():
     add_elector("elector3","elector3","1990-01-01","3")
     
 
-def check_credentials(username, password):
+def encode_auth_token(user_id):
+    """
+    Generates the Auth Token
+    :return: string
+    """
+    with current_app.app_context():
+        try:
+            payload = {
+                'exp': datetime.utcnow() + timedelta(days=0, hours=1),
+                'iat': datetime.utcnow(),
+                'sub': user_id
+            }
+            return jwt.encode(
+                payload,
+                current_app.config.get('SECRET_KEY'),  # secret key
+                algorithm='HS256'
+            )
+        except Exception as e:
+            print(e)
+            return None
 
-    users = User.query.all()
-    for u in users:
-        if check_password_hash(u.username,username): 
-            if check_password_hash(u.password,password):
-                elector = Elector.query.filter_by(id=u.elector_id).first()
-                return get_user(elector.dni)
-    return Error400("Wrong Credentials").get()
+def decode_auth_token(auth_token):
+    """
+    Decodes the auth token
+    :param auth_token:
+    :return: integer|string
+    """
+    with current_app.app_context():
+        try:
+            payload = jwt.decode(auth_token, current_app.config.get('SECRET_KEY'))
+            return payload['sub']
+        except jwt.ExpiredSignatureError:
+            return None
+        except jwt.InvalidTokenError:
+            return None
+
+def validate_auth_token(auth_token):
+    if auth_token is None:
+        return None
+    try:    
+        auth_token = decode_auth_token(auth_token)
+        if not isinstance(auth_token, str):
+            user = User.query.filter_by(id=auth_token).first()
+            return user.to_json()
+        return None
+    except:
+        return None
+
+def check_credentials(username, password):
+    try:
+        users = User.query.all()
+        for u in users:
+            if check_password_hash(u.username,username): 
+                if check_password_hash(u.password,password):
+                    elector = Elector.query.filter_by(id=u.elector_id).first()
+                    print(elector)
+                    if elector:
+                        print(u.id)
+                        auth_token = encode_auth_token(u.id)
+                        print(auth_token)
+                        if auth_token:
+                            user = u.to_json()
+                            user["auth_token"] = auth_token.decode()
+                            user["dni"] = elector.dni
+                            return user, 200
+        return Error400("Wrong Credentials").get()
+    except Exception as e:
+        return Error500().get()
+
+def check_auth_token():
+    auth_header = request.headers.get('Auth-Token')
+    if auth_header:
+        print(auth_header)
+        auth_token = auth_header
+        user = validate_auth_token(auth_token)
+        if user is None:
+            return Error401("Invalid Token").get()
+        else:
+            return user, 200
+    else:
+        return Error401("Missing Auth-Token").get()
 
         
 def can_vote(dni, allowed):
+
+    admin = validate_auth_token(request.headers.get('Auth-Token'))
+    if admin is None or admin["is_admin"] == False:
+        return Error401("Invalid Token").get()
     
     elector = Elector.query.filter_by(dni=dni).first()
 
@@ -74,7 +152,6 @@ def get_elector(dni):
     Params:
         - dni: the user's dni
     """
-
     #find elector with dni
     result = Elector.query.filter_by(dni=dni).all()
     result = [row.to_json() for row in result]
@@ -94,6 +171,11 @@ def new_elector():
         - lastname: the elector's lastname
         - dateofbirth: the elector's birthdate
     """
+
+    admin = validate_auth_token(request.headers.get('Auth-Token'))
+    if admin is None or admin["is_admin"] == False:
+        return Error401("Invalid Token").get()
+
     elector = request.json
     elector = add_elector(elector["firstname"], elector["lastname"], elector["dateofbirth"], elector["dni"])
     if elector is None:
@@ -126,7 +208,6 @@ def get_user(dni):
     Params:
         - dni: the user's dni
     """
-
     #find elector with dni
     elector = Elector.query.filter_by(dni=dni).first()
     if elector is not None:
@@ -211,6 +292,9 @@ def setup(application, config):
 
     db.create_all(app=application)
 
+    current_app.config["SECRET_KEY"] = b64encode(os.urandom(24)).decode('utf-8')
+
+
 def create_app(configuration=None):
     logging.basicConfig(level=logging.INFO)
 
@@ -244,7 +328,7 @@ if __name__ == '__main__':
             host=current_app.config["IP"], 
             port=current_app.config["PORT"], 
             debug=current_app.config["DEBUG"],
-            ssl_context='adhoc'
+            #ssl_context='adhoc'
             )
 
 """

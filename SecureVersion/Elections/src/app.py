@@ -53,11 +53,8 @@ def results():
     with current_app.app_context():
         deadline = current_app.config["DEADLINE"] 
 
-    try:
-        assert(deadline > datetime.now())
+    if deadline > datetime.now():
         return errors.Error400("Elections in Progress").get()
-    except:
-        pass
 
     cs = Candidate.query.all()  # get all the candidates    
     votes = Vote.query.all()  # get all the votes
@@ -109,6 +106,11 @@ def vote():
         return errors.Error400("Elections Terminated").get()
 
     req = request.json
+
+    user,status = get_from(ELECTOR_DB+"check_auth_token",headers={"Auth-Token": request.headers.get('Auth-Token')})
+    if status != 200 or user is None or str(user["elector_id"]) != str(req["elector_id"]):
+        print(user, status)
+        return errors.Error401("Invalid Token").get()
 
     #get candidate with candidate_id
     candidate = Candidate.query.filter_by(id=req["candidate_id"]).first()
@@ -239,7 +241,7 @@ if __name__ == '__main__':
             host=current_app.config["IP"], 
             port=current_app.config["PORT"], 
             debug=current_app.config["DEBUG"],
-            ssl_context='adhoc'
+            #ssl_context='adhoc'
             )
 
 """

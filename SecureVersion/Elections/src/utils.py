@@ -4,12 +4,14 @@ import requests as req
 
 from werkzeug.security import generate_password_hash
 
-def get_from(url, params=None):
+def get_from(url, params=None, headers=None):
+    if headers is None:
+        headers = {}
     try:
         if params is not None:
-            r = req.get(url, timeout=2, params=params)
+            r = req.get(url, timeout=2, params=params, headers=headers)
         else:
-            r = req.get(url, timeout=2)
+            r = req.get(url, timeout=2, headers=headers)
         try:
             json = r.json()
             status = r.status_code
