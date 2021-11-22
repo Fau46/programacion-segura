@@ -62,12 +62,6 @@ paths:
     post:
       summary: New elector
       operationId: app.new_elector
-      parameters:
-        - in: header
-          name: Auth-Token
-          required: true
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -98,11 +92,6 @@ paths:
       summary: Elector's Info
       operationId: app.get_elector
       parameters:
-        - in: header
-          name: Auth-Token
-          required: true
-          schema:
-            type: string
         - in: path
           name: dni
           required: true
@@ -156,11 +145,6 @@ paths:
       summary: User's Info
       operationId: app.get_user
       parameters:
-        - in: header
-          name: Auth-Token
-          required: true
-          schema:
-            type: string
         - in: path
           name: dni
           required: true
