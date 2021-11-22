@@ -104,6 +104,7 @@ def check_credentials(username, password):
                         user = u.to_json()
                         user["auth_token"] = auth_token.decode()
                         user["dni"] = elector.dni
+                        user["can_vote"] = elector.can_vote
                         return user, 200
         return Error400("Wrong Credentials").get()
     except Exception as e:
@@ -118,6 +119,9 @@ def check_auth_token():
         if user is None:
             return Error401("Invalid Token").get()
         else:
+            elector = Elector.query.filter_by(id=user["elector_id"]).first()
+            user["dni"] = elector.dni
+            user["can_vote"] = elector.can_vote
             return user, 200
     else:
         return Error401("Missing Auth-Token").get()

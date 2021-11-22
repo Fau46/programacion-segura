@@ -108,7 +108,7 @@ def vote():
     req = request.json
 
     user,status = get_from(ELECTOR_DB+"check_auth_token",headers={"Auth-Token": request.headers.get('Auth-Token')})
-    if status != 200 or user is None or str(user["elector_id"]) != str(req["elector_id"]):
+    if status != 200 or user is None or str(user["elector_id"]) != str(req["elector_id"]) or user["can_vote"] == False:
         print(user, status)
         return errors.Error401("Invalid Token").get()
 
