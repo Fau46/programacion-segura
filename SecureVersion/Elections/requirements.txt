@@ -2,6 +2,6 @@ connexion[swagger-ui]
 Flask
 requests
 flask-sqlalchemy
-requests
 sqlalchemy_utils
 pyopenssl
+flask-cors
