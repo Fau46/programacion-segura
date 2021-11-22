@@ -6,3 +6,4 @@ flask-cors
 requests
 pyopenssl
 Flask-JWT
+pyjwt>=1.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
