@@ -3,8 +3,6 @@ import logging
 import connexion
 import sys
 from datetime import datetime
-import hashlib
-import json
 from flask_cors import CORS
 
 from flask import current_app, request
@@ -155,7 +153,7 @@ if __name__ == '__main__':
             host=current_app.config["IP"], 
             port=current_app.config["PORT"], 
             debug=current_app.config["DEBUG"],
-            ssl_context='adhoc'
+            #ssl_context='adhoc'
             )
 
 """

@@ -92,6 +92,7 @@ def validate_auth_token(auth_token):
 def check_credentials(username, password):
     try:
         u = User.query.filter_by(username=username).first()
+        print(u)
         if u:
             if check_password_hash(u.password,password):
                 elector = Elector.query.filter_by(id=u.elector_id).first()

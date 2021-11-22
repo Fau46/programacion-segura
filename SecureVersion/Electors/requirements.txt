@@ -6,4 +6,3 @@ flask-cors
 requests
 pyopenssl
 jwt
-base64
