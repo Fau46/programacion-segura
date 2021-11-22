@@ -60,7 +60,7 @@ export default class CandidatesCard extends React.Component{
               ]}
             >
               <Meta
-                avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
+                avatar={<Avatar src={"https://avatars.dicebear.com/api/adventurer/"+candidate.firstname+".svg"} />}
                 title={candidate.firstname+" "+candidate.lastname}
                 description={candidate.party}
               />
