@@ -7,7 +7,7 @@ def get_from(url, params=None):
         if params is not None:
             r = req.get(url, timeout=2, params=params, verify=False)
         else:
-            r = req.get(url, timeout=2)
+            r = req.get(url, timeout=2, verify=False)
         try:
             json = r.json()
             status = r.status_code
