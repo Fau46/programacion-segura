@@ -7,6 +7,7 @@ import CommentsPage from "./Pages/CommentsPage";
 import Login from "./Pages/LoginPage"
 import RegisterElector from "./Pages/RegisterElectorPage";
 import RegisterUser from "./Pages/RegisterUserPage"
+import ResultPage from "./Pages/ResultsPage";
 import UserCanVotePage from "./Pages/UserCanVotePage";
 import UserHome from "./Pages/UserHomePage";
 import Session from "./Session/Session";
@@ -31,6 +32,7 @@ export default class RouterPages extends React.Component{
             <Route path="/admin/user/can_vote" render={() => <UserCanVotePage url={URL_electors} endpoint={"users/{dni}/vote"} title={"Elector voting right"}/>} />
             <Route path="/admin/register/elector" render={() => <RegisterElector url={URL_electors} endpoint={"electors"} title={"Elector Registration"}/>} />
             <Route path="/candidates" render={() => <CandidatesPage url={URL_elections} endpoint={"candidates"}/>} />
+            <Route path="/results" render={() => <ResultPage url={URL_elections} endpoint={"results"} title={"Elections result"}/>} />
             <Route path="/comments" render={() => <CommentsPage url={URL_comments} endpoint={"comments"}/>} />
             <Route path="/home" render={() => <UserHome title={"Welcome "+Session.get("username")}/>} />
           </Switch>

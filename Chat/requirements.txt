@@ -3,3 +3,4 @@ Flask
 requests
 flask-sqlalchemy
 requests
+flask_cors

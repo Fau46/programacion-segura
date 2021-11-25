@@ -3,7 +3,8 @@ import { Layout, Menu, Breadcrumb } from 'antd';
 import {
   DesktopOutlined,
   TeamOutlined,
-  UserOutlined
+  UserOutlined,
+  LogoutOutlined
 } from '@ant-design/icons';
 import Session from "../Session/Session";
 import { Redirect } from 'react-router-dom';
@@ -27,7 +28,6 @@ export default class MainLayout extends React.Component {
 
   componentDidMount(){
     setInterval(() => {
-      console.log("sono qiu")
       if(Session.get("is_admin") == 1){
         var aux = this.adminItems()
         this.setState({items: aux})
@@ -47,7 +47,6 @@ export default class MainLayout extends React.Component {
   };
 
   redirect(page){
-    console.log(page)
     this.setState({
       redirect: page
     })
@@ -59,10 +58,10 @@ export default class MainLayout extends React.Component {
         <Menu.Item key="20" icon={<UserOutlined />}>
             {Session.get("username")}
         </Menu.Item>
-        <Menu.Item key="20" icon={<DesktopOutlined />} onClick={() => this.redirect("/admin/home")}>
+        <Menu.Item key="200" icon={<DesktopOutlined />} onClick={() => this.redirect("/admin/home")}>
             Home
         </Menu.Item>
-        <Menu.Item key="21" icon={<DesktopOutlined />} onClick={
+        <Menu.Item key="21" icon={<LogoutOutlined />} onClick={
           () => {
             Session.clear()
             this.redirect("/login")
@@ -87,10 +86,10 @@ export default class MainLayout extends React.Component {
         <Menu.Item key="20" icon={<UserOutlined />}>
             {Session.get("username")}
         </Menu.Item>
-        <Menu.Item key="20" icon={<DesktopOutlined />} onClick={() => this.redirect("/home")}>
+        <Menu.Item key="200" icon={<DesktopOutlined />} onClick={() => this.redirect("/home")}>
             Home
         </Menu.Item>
-        <Menu.Item key="21" icon={<DesktopOutlined />} onClick={
+        <Menu.Item key="21" icon={<LogoutOutlined />} onClick={
           () => {
             Session.clear()
             this.redirect("/login")
