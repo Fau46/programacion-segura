@@ -53,7 +53,7 @@ export default class UserCanVoteForm extends React.Component{
     
     return (
       <div className="site-card-border-less-wrapper">
-        <Card title={this.props.title} bordered={false} style={{ width: 300 }}>
+        <Card title={this.props.title} bordered={false} style={{ width: 350 }}>
           <Form
             name="basic"
             labelCol={{ span: 8 }}
