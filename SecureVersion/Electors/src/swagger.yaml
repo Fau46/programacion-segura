@@ -62,6 +62,12 @@ paths:
     post:
       summary: New elector
       operationId: app.new_elector
+      parameters:
+        - in: header
+          name: Auth-Token
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
