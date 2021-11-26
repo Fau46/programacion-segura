@@ -1,3 +1,7 @@
-FrontEnd/node_modules
+InsecureVersion/FrontEnd/node_modules
 SecureVersion/FrontEnd/node_modules
 **/*.db
+venv
+SecureVersion/Electors/src/orm.db
+SecureVersion/venv
+InsecureVersion/venv

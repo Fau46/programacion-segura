@@ -1,6 +1,0 @@
-connexion[swagger-ui]
-Flask
-requests
-flask-sqlalchemy
-flask-cors
-requests
