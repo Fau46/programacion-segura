@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+    chat:
+        build: ./Chat
+        network_mode: "host"
+        
+    electors:
+        build: ./Electors
+        network_mode: "host"
+        
+    elections:
+        build: ./Elections
+        network_mode: "host"
+        
+    frontend:
+        build: ./FrontEnd
+        network_mode: "host"
+        ports:
+            - 3000:3000
